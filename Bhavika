@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>Will You Be My Valentine? 💝</title>
+   <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           -webkit-tap-highlight-color: transparent;
+       }
+
+       html {
+           font-size: 16px;
+       }
+
+       body {
+           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+           min-height: 100vh;
+           min-height: 100dvh;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           overflow-x: hidden;
+           position: relative;
+           background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+           padding: 10px;
+       }
+
+       /* Confetti Canvas */
+       #confetti-canvas {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           pointer-events: none;
+           z-index: 1;
+       }
+
+       .container {
+           background: white;
+           padding: clamp(20px, 5vw, 40px);
+           border-radius: 24px;
+           box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+           text-align: center;
+           width: 100%;
+           max-width: 500px;
+           position: relative;
+           z-index: 10;
+           margin: 10px auto;
+           max-height: 95vh;
+           overflow-y: auto;
+           scrollbar-width: none;
+       }
+
+       .container::-webkit-scrollbar {
+           display: none;
+       }
+
+       /* Page visibility classes */
+       .hidden {
+           display: none !important;
+       }
+
+       /* === PAGE 1: Question === */
+       .page-1 h1 {
+           color: #e74c3c;
+           font-size: clamp(1.5rem, 6vw, 2rem);
+           margin-bottom: 30px;
+           animation: pulse 2s infinite;
+           line-height: 1.3;
+       }
+
+       @keyframes pulse {
+           0%, 100% { transform: scale(1); }
+           50% { transform: scale(1.05); }
+       }
+
+       .buttons {
+           display: flex;
+           gap: 20px;
+           justify-content: center;
+           align-items: center;
+           flex-wrap: wrap;
+           position: relative;
+           min-height: 60px;
+       }
+
+       button {
+           padding: 14px 32px;
+           font-size: 1.1rem;
+           border: none;
+           border-radius: 50px;
+           cursor: pointer;
+           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+           font-weight: 600;
+           position: relative;
+           min-width: 120px;
+           touch-action: manipulation;
+           -webkit-appearance: none;
+       }
+
+       button:active {
+           transform: scale(0.95);
+       }
+
+       #yesBtn {
+           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           color: white;
+           box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+       }
+
+       #yesBtn:hover, #yesBtn:active {
+           transform: scale(1.05);
+           box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+       }
+
+       #noBtn {
+           background: #95a5a6;
+           color: white;
+           position: relative;
+           transition: all 0.2s ease;
+       }
+
+       .crying-face {
+           font-size: 60px;
+           display: none;
+           animation: shake 0.5s ease-in-out;
+           margin-top: 25px;
+       }
+
+       @keyframes shake {
+           0%, 100% { transform: rotate(0deg); }
+           25% { transform: rotate(-15deg); }
+           75% { transform: rotate(15deg); }
+       }
+
+       /* === PAGE 2: Success + Photos === */
+       #page2 {
+           display: none;
+       }
+
+       #page2 h2 {
+           color: #e74c3c;
+           font-size: clamp(1.3rem, 5vw, 1.8rem);
+           margin-bottom: 15px;
+           line-height: 1.3;
+       }
+
+       .big-heart {
+           font-size: clamp(60px, 15vw, 80px);
+           animation: heartbeat 1.2s infinite;
+           margin: 10px 0;
+           display: inline-block;
+       }
+
+       @keyframes heartbeat {
+           0%, 100% { transform: scale(1); }
+           25% { transform: scale(1.1); }
+           50% { transform: scale(1.2); }
+           75% { transform: scale(1.1); }
+       }
+
+       .subtitle {
+           color: #666;
+           margin-bottom: 20px;
+           font-size: clamp(0.9rem, 3.5vw, 1rem);
+           padding: 0 10px;
+       }
+
+       .photo-gallery {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 12px;
+           margin: 20px 0;
+           padding: 12px;
+           background: #f8f8f8;
+           border-radius: 16px;
+       }
+
+       .photo-slot {
+           aspect-ratio: 1;
+           background: #e8e8e8;
+           border-radius: 12px;
+           overflow: hidden;
+           position: relative;
+           border: 2px solid #fff;
+           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+       }
+
+       .photo-slot img {
+           width: 100%;
+           height: 100%;
+           object-fit: cover;
+           display: block;
+           transition: transform 0.3s ease;
+       }
+
+       .photo-slot:active img {
+           transform: scale(1.05);
+       }
+
+       .gift-btn {
+           background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+           color: white;
+           margin-top: 15px;
+           padding: 16px 40px;
+           font-size: 1.1rem;
+           animation: glow 2s infinite;
+           width: 100%;
+           max-width: 280px;
+       }
+
+       @keyframes glow {
+           0%, 100% { box-shadow: 0 0 5px rgba(238, 90, 36, 0.5); }
+           50% { box-shadow: 0 0 25px rgba(238, 90, 36, 0.8); }
+       }
+
+       .gift-reveal {
+           display: none;
+           margin-top: 20px;
+           padding: 25px 20px;
+           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           border-radius: 20px;
+           color: white;
+           animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+           box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+       }
+
+       @keyframes popIn {
+           0% { transform: scale(0.8); opacity: 0; }
+           100% { transform: scale(1); opacity: 1; }
+       }
+
+       .voucher-amount {
+           font-size: clamp(2rem, 8vw, 2.5rem);
+           font-weight: bold;
+           margin: 10px 0;
+       }
+
+       .voucher-code {
+           background: rgba(255,255,255,0.2);
+           padding: 12px;
+           border-radius: 10px;
+           font-family: 'Courier New', monospace;
+           font-size: clamp(1.1rem, 4vw, 1.3rem);
+           letter-spacing: 2px;
+           margin-top: 10px;
+           border: 2px dashed rgba(255,255,255,0.5);
+           word-break: break-all;
+       }
+
+       .next-page-btn {
+           background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+           color: white;
+           margin-top: 20px;
+           padding: 14px 30px;
+           font-size: 1rem;
+           width: 100%;
+           max-width: 280px;
+       }
+
+       /* === PAGE 3: Red Theme + Note + Photos === */
+       #page3 {
+           display: none;
+       }
+
+       #page3 h2 {
+           color: #c0392b;
+           font-size: clamp(1.5rem, 6vw, 2rem);
+           margin-bottom: 15px;
+       }
+
+       .love-note {
+           background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+           border-left: 4px solid #e74c3c;
+           padding: 20px;
+           margin: 15px 0;
+           text-align: left;
+           font-style: italic;
+           color: #444;
+           line-height: 1.7;
+           border-radius: 0 12px 12px 0;
+           font-size: clamp(0.95rem, 3.5vw, 1rem);
+       }
+
+       .love-note p {
+           margin-bottom: 12px;
+       }
+
+       .photo-section {
+           margin-top: 20px;
+       }
+
+       .photo-section h3 {
+           color: #e74c3c;
+           margin-bottom: 15px;
+           font-size: clamp(1.1rem, 4vw, 1.3rem);
+       }
+
+       .large-photo-slot {
+           width: 100%;
+           aspect-ratio: 4/3;
+           background: linear-gradient(135deg, #ffe0e0 0%, #ffc0c0 100%);
+           border-radius: 16px;
+           overflow: hidden;
+           margin-bottom: 12px;
+           border: 3px solid #fff;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+       }
+
+       .large-photo-slot img {
+           width: 100%;
+           height: 100%;
+           object-fit: cover;
+       }
+
+       .memory-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 10px;
+       }
+
+       .back-btn {
+           background: #95a5a6;
+           color: white;
+           margin-top: 20px;
+           padding: 12px 30px;
+           font-size: 1rem;
+       }
+
+       /* Floating hearts animation */
+       .floating-heart {
+           position: fixed;
+           font-size: 24px;
+           pointer-events: none;
+           animation: float 10s infinite linear;
+           z-index: 2;
+           opacity: 0.6;
+           will-change: transform;
+       }
+
+       @keyframes float {
+           0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+           10% { opacity: 0.6; }
+           90% { opacity: 0.6; }
+           100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+       }
+
+       /* Background colors for pages */
+       body.page-2-active {
+           background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+       }
+
+       body.page-3-active {
+           background: linear-gradient(135deg, #ff6b6b 0%, #c0392b 100%);
+       }
+
+       /* Mobile optimizations */
+       @media (max-width: 380px) {
+           .container {
+               padding: 15px;
+               border-radius: 20px;
+           }
+           
+           .photo-gallery {
+               gap: 8px;
+               padding: 10px;
+           }
+           
+           button {
+               padding: 12px 24px;
+               font-size: 1rem;
+               min-width: 100px;
+           }
+       }
+
+       @media (min-width: 768px) {
+           .container {
+               max-width: 600px;
+           }
+           
+           .photo-gallery {
+               grid-template-columns: repeat(2, 1fr);
+               gap: 15px;
+           }
+       }
+
+       /* Prevent text selection */
+       .no-select {
+           -webkit-user-select: none;
+           -moz-user-select: none;
+           -ms-user-select: none;
+           user-select: none;
+       }
+   </style>
+</head>
+<body id="body">
+   <canvas id="confetti-canvas"></canvas>
+   <div id="floating-hearts"></div>
+
+   <!-- PAGE 1: Question -->
+   <div class="container page-1 no-select" id="page1">
+       <h1>Will You Be My Valentine? 💝</h1>
+       <div class="buttons">
+           <button id="yesBtn" onclick="goToPage2()">Yes 💖</button>
+           <button id="noBtn" onclick="sayNo()" onmouseenter="runAway()" ontouchstart="handleTouch(event)">No 💔</button>
+       </div>
+       <div class="crying-face" id="cryingFace">😭</div>
+   </div>
+
+   <!-- PAGE 2: Success + Photos -->
+   <div class="container" id="page2">
+       <h2>Thank You For Being With Me! 💕</h2>
+       <div class="big-heart">💖</div>
+       <p class="subtitle">You make my world complete!</p>
+       
+       <div class="photo-gallery">
+           <div class="photo-slot">
+               <img src="https://i.ibb.co/wZWMZ2gs/IMG-20251029-WA0002.jpg" alt="Memory 1" loading="lazy">
+           </div>
+           <div class="photo-slot">
+               <img src="https://i.ibb.co/V5N6VV0/Screenshot-20251201-214654-Instagram.jpg" alt="Memory 2" loading="lazy">
+           </div>
+           <div class="photo-slot">
+               <img src="https://i.ibb.co/chwx9sg9/IMG-20251219-WA0011.jpg" alt="Memory 3" loading="lazy">
+           </div>
+           <div class="photo-slot">
+               <img src="https://i.ibb.co/GvvdqC04/IMG-20260202-WA0018.jpg" alt="Memory 4" loading="lazy">
+           </div>
+       </div>
+
+       <button class="gift-btn" onclick="revealGift()">🎁 This is for you</button>
+       
+       <div class="gift-reveal" id="giftReveal">
+           <div style="font-size: 0.9em; opacity: 0.9;">SPECIAL VALENTINE GIFT</div>
+           <div class="voucher-amount">₹500</div>
+           <div style="font-size: 1.1em;">Gift Voucher</div>
+           <div class="voucher-code">serialnumber-6014868793983788 pin-SVWP-N4UQAH-EXP</div>
+           <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">Use this code to redeem your gift!</p>
+       </div>
+
+       <button class="next-page-btn" onclick="goToPage3()">💌 A Special Note →</button>
+   </div>
+
+   <!-- PAGE 3: Red Theme + Note + Photos -->
+   <div class="container" id="page3">
+       <h2>My Love For You ❤️</h2>
+       
+       <div class="love-note">
+           <p>Bhavika🌻,</p>
+           <p>Happy Valentine's Day! Thanks for choosing me even from far away. Missing you like crazy, but you're worth every "wish you were here" moment. Can't wait to finally hold you again.
+Love you, Deepu</p>
+           <p>Thank you for being my partner, my best friend.I promise to cherish you today, tomorrow, and always.</p>
+           
+           <p style="text-align: right; margin-top: 15px;">Forever Yours,<br>❤️</p>
+       </div>
+
+       <div class="photo-section">
+           <h3>Our Beautiful Memories 📸</h3>
+           <div class="large-photo-slot">
+               <img src="https://i.ibb.co/jksRjV8Q/IMG-20260202-WA0012.jpg"alt="Special Memory" loading="lazy">
+           </div>
+           <div class="memory-grid">
+               <div
+          
+               </div>
+               <div class="photo-slot">
+                   <img src="https://i.ibb.co/m1HBDjz/IMG-20260202-WA0017.jpg loading"="lazy">
+               </div>
+           </div>
+       </div>
+       <button class="back-btn" onclick="backToPage2()">← Back</button>
+   </div>
+
+   <script>
+       const noBtn = document.getElementById('noBtn');
+       let noCount = 0;
+       let isMoving = false;
+
+       // Confetti Canvas Setup with device pixel ratio
+       const canvas = document.getElementById('confetti-canvas');
+       const ctx = canvas.getContext('2d');
+       const dpr = window.devicePixelRatio || 1;
+       
+       function resizeCanvas() {
+           canvas.width = window.innerWidth * dpr;
+           canvas.height = window.innerHeight * dpr;
+           ctx.scale(dpr, dpr);
+           canvas.style.width = window.innerWidth + 'px';
+           canvas.style.height = window.innerHeight + 'px';
+       }
+       resizeCanvas();
+
+       const hearts = [];
+       const heartSymbols = ['💖', '💝', '💗', '💓', '💕', '❤️', '💘'];
+       const maxHearts = 50; // Limit for performance
+
+       class Heart {
+           constructor(x, y) {
+               this.x = x || Math.random() * window.innerWidth;
+               this.y = y || window.innerHeight + 20;
+               this.size = Math.random() * 15 + 10;
+               this.speedY = Math.random() * 1.5 + 0.5;
+               this.speedX = Math.random() * 1 - 0.5;
+               this.symbol = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+               this.rotation = Math.random() * 360;
+               this.rotationSpeed = Math.random() * 1 - 0.5;
+               this.opacity = Math.random() * 0.4 + 0.6;
+           }
+
+           update() {
+               this.y -= this.speedY;
+               this.x += Math.sin(this.y * 0.01) * 0.5 + this.speedX;
+               this.rotation += this.rotationSpeed;
+               
+               if (this.y < -50) {
+                   this.y = window.innerHeight + 20;
+                   this.x = Math.random() * window.innerWidth;
+               }
+           }
+
+           draw() {
+               ctx.save();
+               ctx.globalAlpha = this.opacity;
+               ctx.translate(this.x, this.y);
+               ctx.rotate(this.rotation * Math.PI / 180);
+               ctx.font = `${this.size}px Arial`;
+               ctx.fillText(this.symbol, -this.size/2, this.size/2);
+               ctx.restore();
+           }
+       }
+
+       // Initialize hearts
+       for (let i = 0; i < 25; i++) {
+           hearts.push(new Heart());
+       }
+
+       let animationId;
+       let lastTime = 0;
+       const fps = 30;
+       const fpsInterval = 1000 / fps;
+
+       function animateConfetti(currentTime) {
+           animationId = requestAnimationFrame(animateConfetti);
+           
+           const elapsed = currentTime - lastTime;
+           if (elapsed < fpsInterval) return;
+           lastTime = currentTime - (elapsed % fpsInterval);
+
+           ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+           hearts.forEach(heart => {
+               heart.update();
+               heart.draw();
+           });
+       }
+
+       animateConfetti(0);
+
+       // Optimized floating hearts
+       function createFloatingHearts() {
+           const container = document.getElementById('floating-hearts');
+           const fragment = document.createDocumentFragment();
+           
+           for (let i = 0; i < 8; i++) {
+               const heart = document.createElement('div');
+               heart.className = 'floating-heart';
+               heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+               heart.style.left = Math.random() * 100 + '%';
+               heart.style.animationDuration = (Math.random() * 6 + 10) + 's';
+               heart.style.animationDelay = (Math.random() * 5) + 's';
+               heart.style.fontSize = (Math.random() * 15 + 20) + 'px';
+               fragment.appendChild(heart);
+           }
+           container.appendChild(fragment);
+       }
+       createFloatingHearts();
+
+       // Mobile touch handling
+       function handleTouch(e) {
+           e.preventDefault();
+           runAway();
+       }
+
+       function runAway() {
+           if (isMoving) return;
+           isMoving = true;
+           
+           const btnRect = noBtn.getBoundingClientRect();
+           const maxX = window.innerWidth - btnRect.width - 20;
+           const maxY = window.innerHeight - btnRect.height - 20;
+           
+           const currentX = parseFloat(noBtn.style.left) || btnRect.left;
+           const currentY = parseFloat(noBtn.style.top) || btnRect.top;
+           
+           let newX, newY;
+           let attempts = 0;
+           
+           do {
+               newX = Math.random() * (maxX - 20) + 10;
+               newY = Math.random() * (maxY - 100) + 50;
+               attempts++;
+           } while (attempts < 10 && Math.abs(newX - currentX) < 100 && Math.abs(newY - currentY) < 100);
+           
+           noBtn.style.position = 'fixed';
+           noBtn.style.left = newX + 'px';
+           noBtn.style.top = newY + 'px';
+           noBtn.style.zIndex = '1000';
+           noBtn.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+           
+           noCount++;
+           
+           if (noCount > 3) {
+               document.getElementById('cryingFace').style.display = 'block';
+               noBtn.textContent = 'Please? 🥺';
+           }
+           
+           setTimeout(() => {
+               isMoving = false;
+           }, 300);
+       }
+
+       function sayNo() {
+           runAway();
+       }
+
+       function goToPage2() {
+           document.getElementById('page1').classList.add('hidden');
+           document.getElementById('page2').style.display = 'block';
+           document.body.classList.add('page-2-active');
+           
+           // Burst effect
+           for (let i = 0; i < 15 && hearts.length < maxHearts; i++) {
+               setTimeout(() => {
+                   hearts.push(new Heart(window.innerWidth/2, window.innerHeight/2));
+               }, i * 50);
+           }
+       }
+
+       function revealGift() {
+           const giftReveal = document.getElementById('giftReveal');
+           const giftBtn = document.querySelector('.gift-btn');
+           
+           giftReveal.style.display = 'block';
+           giftBtn.style.display = 'none';
+           
+           // Celebration burst
+           for (let i = 0; i < 20 && hearts.length < maxHearts; i++) {
+               setTimeout(() => {
+                   const h = new Heart(window.innerWidth/2, window.innerHeight/2);
+                   h.speedY = Math.random() * 3 + 2;
+                   h.speedX = Math.random() * 3 - 1.5;
+                   hearts.push(h);
+               }, i * 30);
+           }
+       }
+
+       function goToPage3() {
+           document.getElementById('page2').style.display = 'none';
+           document.getElementById('page3').style.display = 'block';
+           document.body.classList.remove('page-2-active');
+           document.body.classList.add('page-3-active');
+           window.scrollTo(0, 0);
+       }
+
+       function backToPage2() {
+           document.getElementById('page3').style.display = 'none';
+           document.getElementById('page2').style.display = 'block';
+           document.body.classList.remove('page-3-active');
+           document.body.classList.add('page-2-active');
+           window.scrollTo(0, 0);
+       }
+
+       // Optimized resize handler
+       let resizeTimeout;
+       window.addEventListener('resize', () => {
+           clearTimeout(resizeTimeout);
+           resizeTimeout = setTimeout(() => {
+               resizeCanvas();
+           }, 250);
+       }, { passive: true });
+
+       // Visibility API to pause animation when tab is hidden
+       document.addEventListener('visibilitychange', () => {
+           if (document.hidden) {
+               cancelAnimationFrame(animationId);
+           } else {
+               animateConfetti(0);
+           }
+       });
+
+       // Preload images
+       const imageUrls = [
+           'https://i.ibb.co/wZWMZ2gs/IMG-20251029-WA0002.jpg',
+           'https://i.ibb.co/V5N6VV0/Screenshot-20251201-214654-Instagram.jpg',
+           'https://i.ibb.co/chwx9sg9/IMG-20251219-WA0011.jpg',
+           'https://i.ibb.co/GvvdqC04/IMG-20260202-WA0018.jpg'
+       ];
+
+       imageUrls.forEach(url => {
+           const img = new Image();
+           img.src = url;
+       });
+   </script>
+</body>
+</html>
